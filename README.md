@@ -1,7 +1,9 @@
 # Distributed AI SAAS Platform 🚀
 
-An AI-powered distributed SAAS platform that generates full-stack React applications from natural language prompts using Java, Spring Boot, and Spring AI.
+An AI-powered distributed SAAS platform that generates full React applications from natural language prompts using Java, Spring Boot, and Spring AI.
 The platform is designed with production-grade distributed systems concepts including scalability, concurrency handling, streaming architecture, containerized deployments, and multi-tenant support.
+
+Repository: [lovableclone GitHub Repository](https://github.com/Mani5746/lovableclone?utm_source=chatgpt.com)
 
 ---
 
@@ -11,37 +13,37 @@ The platform is designed with production-grade distributed systems concepts incl
 
 * Generate complete React applications using natural language prompts
 * Built using Spring AI for seamless AI integration
-* Supports real-time AI response generation
+* Supports AI-driven code generation workflows
 
 ## ⚡ Real-Time Streaming
 
 * Implemented Server-Sent Events (SSE) for low-latency token streaming
 * Supports concurrent AI generation sessions
-* Real-time response delivery for improved user experience
+* Real-time response delivery for smooth user experience
 
 ## 🗂️ Storage & Persistence
 
 * Integrated MinIO object storage
-* Reliable project and generated code storage
-* Persistent storage support for generated applications
+* Persistent project and generated code storage
+* Reliable backend persistence mechanisms
 
 ## ☸️ Scalable Distributed Architecture
 
 * Kubernetes-ready backend architecture
 * Containerized workflows using Docker
-* Designed for horizontal scalability and distributed deployment
+* Designed for scalability and distributed deployment
 
 ## 🖥️ Live Preview System
 
 * Live rendering and execution of generated React applications
 * Rapid preview workflows for generated projects
-* Improves developer productivity and iteration speed
+* Faster iteration and development cycle
 
 ## 🔐 Multi-Tenant SAAS Architecture
 
 * Role-Based Access Control (RBAC)
-* Token quota tracking system
-* Subscription-ready SAAS backend architecture
+* Token quota tracking
+* Subscription-ready architecture
 * Tenant isolation support
 
 ## 🏗️ Production-Grade System Design
@@ -53,7 +55,7 @@ Focused on:
 * Concurrency handling
 * Distributed systems architecture
 * Backend optimization
-* Fault-tolerant design patterns
+* Fault-tolerant workflows
 
 ---
 
@@ -74,19 +76,17 @@ Focused on:
 
 ## Storage
 
-* MinIO Object Storage
 * PostgreSQL
+* MinIO Object Storage
 
 ## Infrastructure
 
 * Docker
 * Kubernetes
-* Containerized Build Workflows
 
 ## Frontend Generation
 
 * React.js
-* AI-generated component architecture
 
 ---
 
@@ -95,17 +95,17 @@ Focused on:
 ```text
 User Prompt
      ↓
-Spring Boot API Gateway
+Spring Boot API Layer
      ↓
-Spring AI Processing Layer
+Spring AI Processing Engine
      ↓
 Real-Time SSE Streaming
      ↓
-Code Generation Engine
+AI Code Generation Workflow
      ↓
-MinIO + Database Persistence
+MinIO + Database Storage
      ↓
-Containerized Build Workflow
+Containerized Build Pipeline
      ↓
 Live React Preview
 ```
@@ -114,12 +114,12 @@ Live React Preview
 
 # 🔥 Core Functionalities
 
-* AI-based React code generation
-* Concurrent real-time streaming
-* Multi-user session handling
-* Live preview rendering
+* AI-based React application generation
+* Real-time token streaming
+* Concurrent session handling
+* Live project preview rendering
 * Distributed backend architecture
-* Token quota management
+* Multi-tenant SAAS workflows
 * Secure authentication & authorization
 * Persistent project storage
 * Kubernetes-ready deployment support
@@ -129,16 +129,9 @@ Live React Preview
 # 📂 Project Structure
 
 ```text
-distributed-ai-saas-platform/
+lovableclone/
 │
 ├── backend/
-│   ├── auth-service/
-│   ├── ai-service/
-│   ├── streaming-service/
-│   ├── project-service/
-│   └── preview-service/
-│
-├── frontend/
 │
 ├── docker/
 │
@@ -158,7 +151,6 @@ distributed-ai-saas-platform/
 * Java 21
 * Maven
 * Docker
-* Kubernetes (optional)
 * PostgreSQL
 * MinIO
 
@@ -169,11 +161,11 @@ distributed-ai-saas-platform/
 ## Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/distributed-ai-saas-platform.git
-cd distributed-ai-saas-platform
+git clone https://github.com/Mani5746/lovableclone.git
+cd lovableclone
 ```
 
-## Build the Backend
+## Build the Project
 
 ```bash
 mvn clean install
@@ -189,16 +181,16 @@ mvn spring-boot:run
 
 # 🐳 Docker Support
 
-Build Docker Image:
+## Build Docker Image
 
 ```bash
-docker build -t distributed-ai-saas .
+docker build -t lovableclone .
 ```
 
-Run Container:
+## Run Docker Container
 
 ```bash
-docker run -p 8080:8080 distributed-ai-saas
+docker run -p 8080:8080 lovableclone
 ```
 
 ---
@@ -229,7 +221,7 @@ The platform is designed with distributed systems principles:
 * Concurrent streaming support
 * Fault-tolerant architecture
 * Container orchestration support
-* Production-ready backend workflows
+* Production-grade backend workflows
 
 ---
 
@@ -246,10 +238,17 @@ The platform is designed with distributed systems principles:
 
 # 👨‍💻 Author
 
-Built with passion for scalable backend engineering, distributed systems, and AI-powered developer tools.
+### [Manish Srivastava GitHub Profile](https://github.com/Mani5746?utm_source=chatgpt.com)
+
+Backend Developer passionate about:
+
+* Distributed Systems
+* AI-powered Platforms
+* Scalable Backend Architecture
+* Spring Boot & Java Ecosystem
 
 ---
 
-# ⭐ If you like this project
+# ⭐ Support
 
-Give this repository a star ⭐ and support the journey!
+If you like this project, consider giving it a star ⭐ on GitHub.
