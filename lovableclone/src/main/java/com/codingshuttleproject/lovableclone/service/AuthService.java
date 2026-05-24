@@ -1,4 +1,4 @@
-package com.codingshuttleproject.lovableclone.service.impl;
+package com.codingshuttleproject.lovableclone.service;
 
 import com.codingshuttleproject.lovableclone.dto.auth.AuthResponse;
 import com.codingshuttleproject.lovableclone.dto.auth.LoginRequest;
@@ -6,13 +6,9 @@ import com.codingshuttleproject.lovableclone.dto.auth.SignupRequest;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthService {
+public interface AuthService {
 
-    public AuthResponse signup(SignupRequest request) {
-        return null;
-    }
+    AuthResponse signup(SignupRequest request);
 
-    public AuthResponse login(LoginRequest request) {
-        return null;
-    }
+     AuthResponse login(LoginRequest request);
 }
