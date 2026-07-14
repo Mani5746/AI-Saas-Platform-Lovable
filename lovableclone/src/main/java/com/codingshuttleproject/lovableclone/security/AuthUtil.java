@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
 
 @Component
@@ -40,6 +41,6 @@ public class AuthUtil {
 
         Long userId=Long.parseLong(claims.get("userId").toString());
         String username=claims.getSubject();
-        return new JwtUserPrincipal(userId,username);
+        return new JwtUserPrincipal(userId,username, new ArrayList<>());
     }
 }
