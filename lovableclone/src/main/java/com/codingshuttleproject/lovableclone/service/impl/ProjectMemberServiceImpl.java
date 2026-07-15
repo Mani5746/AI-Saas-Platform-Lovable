@@ -11,6 +11,7 @@ import com.codingshuttleproject.lovableclone.mapper.ProjectMemberMapper;
 import com.codingshuttleproject.lovableclone.repository.ProjectMemberRepository;
 import com.codingshuttleproject.lovableclone.repository.ProjectRepository;
 import com.codingshuttleproject.lovableclone.repository.UserRepository;
+import com.codingshuttleproject.lovableclone.security.AuthUtil;
 import com.codingshuttleproject.lovableclone.service.ProjectMemberService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -30,10 +31,12 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     ProjectMemberRepository projectMemberRepository;
     ProjectMemberMapper projectMemberMapper;
     ProjectRepository projectRepository;
+    AuthUtil authUtil;
     private final UserRepository userRepository;
 
     @Override
-    public List<MemberResponse> getProjectMembers(Long projectId, Long userId) {
+    public List<MemberResponse> getProjectMembers(Long projectId) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
         List<MemberResponse> memberResponseList =
                 projectMemberRepository.findByIdProjectId(projectId)
@@ -45,8 +48,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse inviteMember(Long projectId, InviteMemberRequest request, Long userId) {
-
+    public MemberResponse inviteMember(Long projectId, InviteMemberRequest request) {
+        Long userId = authUtil.getCurrentUserId();
         Project project=getAccessibleProjectById(projectId, userId);
         User invitee= userRepository.findByUsername(request.username()).orElseThrow();
 
@@ -72,7 +75,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse updateMemberRole(Long projectId, Long memberId, @Valid UpdateMemberRoleRequest request, Long userId) {
+    public MemberResponse updateMemberRole(Long projectId, Long memberId, @Valid UpdateMemberRoleRequest request) {
+        Long userId = authUtil.getCurrentUserId();
         Project project=getAccessibleProjectById(projectId, userId);
         ProjectMemberId projectMemberId= new ProjectMemberId(projectId,memberId);
         ProjectMember projectMember=projectMemberRepository.findById(projectMemberId).orElseThrow();
@@ -83,7 +87,8 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public void removeProjectMember(Long projectId, Long memberId, Long userId) {
+    public void removeProjectMember(Long projectId, Long memberId) {
+        Long userId = authUtil.getCurrentUserId();
         Project project=getAccessibleProjectById(projectId, userId);
         ProjectMemberId projectMemberId= new ProjectMemberId(projectId,memberId);
 

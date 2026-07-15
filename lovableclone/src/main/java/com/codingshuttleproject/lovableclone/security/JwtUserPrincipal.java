@@ -1,9 +1,10 @@
 package com.codingshuttleproject.lovableclone.security;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
 public record JwtUserPrincipal(
         Long userId,
         String username,

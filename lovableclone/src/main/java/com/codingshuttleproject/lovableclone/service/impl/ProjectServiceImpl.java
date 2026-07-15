@@ -13,6 +13,7 @@ import com.codingshuttleproject.lovableclone.mapper.ProjectMapper;
 import com.codingshuttleproject.lovableclone.repository.ProjectMemberRepository;
 import com.codingshuttleproject.lovableclone.repository.ProjectRepository;
 import com.codingshuttleproject.lovableclone.repository.UserRepository;
+import com.codingshuttleproject.lovableclone.security.AuthUtil;
 import com.codingshuttleproject.lovableclone.service.ProjectService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -33,25 +34,30 @@ public class ProjectServiceImpl implements ProjectService {
     UserRepository userRepository;
     ProjectMapper projectMapper;
     private final ProjectMemberRepository projectMemberRepository;
+    AuthUtil authUtil;
 
     @Override
-    public List<ProjectSummaryResponse> getUserProjects(Long userId) {
-
+    public List<ProjectSummaryResponse> getUserProjects() {
+     Long userId = authUtil.getCurrentUserId();
         var projects=projectRepository.findAllAccessibleByUser(userId);
         return projectMapper.toListOfProjectSummaryResponse(projects);
     }
 
     @Override
-    public ProjectResponse getUserProjectById(Long id, Long userId) {
+    public ProjectResponse getUserProjectById(Long id) {
+        Long userId = authUtil.getCurrentUserId();
         Project project =getAccessibleProjectById(id,userId);
        return projectMapper.toProjectResponse(project);
     }
 
     @Override
-    public ProjectResponse createProject(ProjectRequest request, Long userId) {
-    User owner=userRepository.findById(userId).orElseThrow(
-            ()->new ResourceNotFoundException("User", userId.toString())
-    );
+    public ProjectResponse createProject(ProjectRequest request) {
+        Long userId = authUtil.getCurrentUserId();
+
+//    User owner=userRepository.findById(userId).orElseThrow(
+//            ()->new ResourceNotFoundException("User", userId.toString())
+//    );
+        User owner=userRepository.getReferenceById(userId);
         Project project=Project.builder()
                 .name(request.name())
                 .isPublic(false)
@@ -72,7 +78,8 @@ ProjectMemberId projectMemberId= new ProjectMemberId(project.getId(), owner.getI
     }
 
     @Override
-    public ProjectResponse updateProject(Long id, ProjectRequest request, Long userId) {
+    public ProjectResponse updateProject(Long id, ProjectRequest request) {
+        Long userId = authUtil.getCurrentUserId();
          Project project =getAccessibleProjectById(id,userId);
 
          project.setName(request.name());
@@ -81,7 +88,8 @@ ProjectMemberId projectMemberId= new ProjectMemberId(project.getId(), owner.getI
     }
 
     @Override
-    public void softDelete(Long id, Long userId) {
+    public void softDelete(Long id) {
+        Long userId = authUtil.getCurrentUserId();
         Project project =getAccessibleProjectById(id,userId);
 
         project.setDeletedAt(Instant.now());
