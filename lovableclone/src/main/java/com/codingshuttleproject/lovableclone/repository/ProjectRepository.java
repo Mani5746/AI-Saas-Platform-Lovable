@@ -34,5 +34,5 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                AND pm.id.projectId=:projectId
                       )
             """)
-    Optional<Project> findAccessibleProjectById(@Param("projectId") Long projectId);
+    Optional<Project> findAccessibleProjectById(@Param("projectId") Long projectId ,@Param("userId") Long userId);
 }
