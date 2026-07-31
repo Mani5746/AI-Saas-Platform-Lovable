@@ -41,13 +41,22 @@ public class StripePaymentProcessor implements PaymentProcessor {
                                 .setQuantity(1L)
                                 .build())
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                .setSuccessUrl(frontendUrl+"/success?session_id={CHECKOUT_SESSION_ID}")
-                .setCancelUrl("http://localhost:5173/cancel")
+                .setSubscriptionData(
+                        new SessionCreateParams.SubscriptionData.Builder()
+                                .setBillingMode(SessionCreateParams.SubscriptionData.BillingMode.builder()
+                                .setType(SessionCreateParams.SubscriptionData.BillingMode.Type.FLEXIBLE)
+                                        .build())
+                                .build()
+                )
+                .setSuccessUrl(frontendUrl+ "/success.html?session_id={CHECKOUT_SESSION_ID}")
+                .setCancelUrl(frontendUrl+ "/cancel.html?session_id={CHECKOUT_SESSION_ID}")
+                .putMetadata("user_id",userId.toString())
+                .putMetadata("plan_id",plan.getId().toString())
                 .build();
 
         Session session;
         try {
-            session = stripeClient.v1().checkout().sessions().create(params);
+            session=Session.create(params);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create Stripe checkout session", e);
         }
