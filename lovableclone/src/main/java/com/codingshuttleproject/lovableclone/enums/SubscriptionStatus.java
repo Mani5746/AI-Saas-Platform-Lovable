@@ -1,5 +1,6 @@
 package com.codingshuttleproject.lovableclone.enums;
 
 public enum SubscriptionStatus {
-   ACTIVE,TRAILING,CANCELLED,PAST_DUE,INCOMPLETE;
+   ACTIVE,CANCELLED,PAST_DUE,INCOMPLETE, TRIALING;
+
 }
