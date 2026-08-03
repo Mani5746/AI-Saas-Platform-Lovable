@@ -6,6 +6,7 @@ import com.codingshuttleproject.lovableclone.dto.Subscription.PortalResponse;
 import com.codingshuttleproject.lovableclone.entity.Plan;
 import com.codingshuttleproject.lovableclone.entity.User;
 import com.codingshuttleproject.lovableclone.enums.SubscriptionStatus;
+import com.codingshuttleproject.lovableclone.errors.BadRequestException;
 import com.codingshuttleproject.lovableclone.errors.ResourceNotFoundException;
 import com.codingshuttleproject.lovableclone.repository.PlanRepository;
 import com.codingshuttleproject.lovableclone.repository.UserRepository;
@@ -86,7 +87,26 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
     @Override
     public PortalResponse openCustomerPortal() {
-        return null;
+        Long userId=authUtil.getCurrentUserId();
+        User user=getUser(userId);
+        String stripeCustomerId=user.getStripeCustomerId();
+
+        if(stripeCustomerId==null || stripeCustomerId.isEmpty()){
+            throw new BadRequestException("User does not have a Stripe Customer Id,UserId:"+userId);
+        }
+        try {
+            var portalSession= com.stripe.model.billingportal.Session.create(
+                    com.stripe.param.billingportal.SessionCreateParams.builder()
+                            .setCustomer(stripeCustomerId)
+                            .setReturnUrl(frontendUrl)
+
+                            .build()
+            );
+
+            return new PortalResponse(portalSession.getUrl());
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -149,8 +169,6 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
 
     }
-
-
 
     private void handleCustomerSubscriptionDeleted(Subscription subscription){
         if(subscription==null){
