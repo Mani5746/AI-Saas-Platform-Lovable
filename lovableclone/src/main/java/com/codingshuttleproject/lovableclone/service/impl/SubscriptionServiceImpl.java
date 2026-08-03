@@ -11,6 +11,7 @@ import com.codingshuttleproject.lovableclone.enums.SubscriptionStatus;
 import com.codingshuttleproject.lovableclone.errors.ResourceNotFoundException;
 import com.codingshuttleproject.lovableclone.mapper.SubscriptionMapper;
 import com.codingshuttleproject.lovableclone.repository.PlanRepository;
+import com.codingshuttleproject.lovableclone.repository.ProjectMemberRepository;
 import com.codingshuttleproject.lovableclone.repository.SubscriptionRepository;
 import com.codingshuttleproject.lovableclone.repository.UserRepository;
 import com.codingshuttleproject.lovableclone.security.AuthUtil;
@@ -32,6 +33,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
   private final SubscriptionMapper subscriptionMapper;
   private final UserRepository userRepository;
   private final PlanRepository planRepository;
+  private final ProjectMemberRepository projectMemberRepository;
 
     @Override
     public SubscriptionResponse getCurrentSubscription() {
@@ -132,6 +134,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         // Notify User via email
     }
 
+
+
 // Utility methods
 
     private User getUser(Long userId) {
@@ -147,5 +151,19 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private Subscription getSubscription(String gatewaySubscriptionId) {
         return subscriptionRepository.findByStripeSubscriptionId(gatewaySubscriptionId).
                 orElseThrow(() -> new ResourceNotFoundException("Subscription", gatewaySubscriptionId));
+    }
+
+    private final Integer FREE_TIER_PROJECTS_ALLOWED = 1;
+    @Override
+    public boolean canCreateNewProject() {
+        Long userId= authUtil.getCurrentUserId();
+        SubscriptionResponse currentSubscription=getCurrentSubscription();
+        int countOfOwnedProject= projectMemberRepository.countProjectOwnedByUser(userId);
+
+        if(currentSubscription.plan()==null){
+            return countOfOwnedProject< FREE_TIER_PROJECTS_ALLOWED;
+        }
+
+        return countOfOwnedProject< currentSubscription.plan().maxProjects();
     }
 }
