@@ -41,3 +41,8 @@ logging:
   level:
     org.springframework.ai:
       chat.client: DEBUG
+minio:
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  project-bucket: projects
