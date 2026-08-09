@@ -12,6 +12,7 @@ import java.time.Instant;
 @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Builder
+@Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatSession {
 

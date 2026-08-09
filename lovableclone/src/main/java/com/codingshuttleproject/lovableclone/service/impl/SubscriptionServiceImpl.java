@@ -34,6 +34,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
   private final UserRepository userRepository;
   private final PlanRepository planRepository;
   private final ProjectMemberRepository projectMemberRepository;
+  private final Integer FREE_TIER_PROJECTS_ALLOWED = 100;
+
 
     @Override
     public SubscriptionResponse getCurrentSubscription() {
@@ -153,7 +155,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 orElseThrow(() -> new ResourceNotFoundException("Subscription", gatewaySubscriptionId));
     }
 
-    private final Integer FREE_TIER_PROJECTS_ALLOWED = 1;
     @Override
     public boolean canCreateNewProject() {
         Long userId= authUtil.getCurrentUserId();

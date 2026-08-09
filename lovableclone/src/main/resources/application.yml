@@ -3,9 +3,9 @@ spring:
     name: lovableclone
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/testdb
-    username: postgres
-    password: Manish@123
+    url: jdbc:postgresql://localhost:9010/pgvector-test
+    username: user
+    password: password
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -22,8 +22,9 @@ spring:
       base-url: https://openrouter.ai/api
       chat:
           options:
-            model: openai/gpt-oss-20b:free
+            model: poolside/laguna-s-2.1:free
             temperature: 0.0
+
 
 jwt:
   secret-key: "8f4d2a7c9b3e1f6a4d8b2c5e7f1a9d3c6e8f0b2a4c7d9e1f3a5b8c2d6e9f1a4"
@@ -35,3 +36,8 @@ stripe:
     secret: ${STRIPE_WEBHOOK_SECRET}
 
 client.url: http://localhost:8080
+
+logging:
+  level:
+    org.springframework.ai:
+      chat.client: DEBUG

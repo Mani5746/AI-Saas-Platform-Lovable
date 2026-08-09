@@ -3,6 +3,7 @@ package com.codingshuttleproject.lovableclone.controllers;
 import com.codingshuttleproject.lovableclone.dto.chat.ChatRequest;
 import com.codingshuttleproject.lovableclone.entity.ChatMessage;
 import com.codingshuttleproject.lovableclone.service.AiGenerationService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;

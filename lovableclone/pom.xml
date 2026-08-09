@@ -21,7 +21,12 @@
 	<properties>
 		<java.version>21</java.version>
 		<org.mapstruct.version>1.6.3</org.mapstruct.version>
-		<spring-ai-version>2.0.0-M1</spring-ai-version>
+		<!--
+			Spring AI 2.0.0-M1 targets Spring Boot 4 / Spring Framework 7.
+			This application uses Spring Boot 3.3.x, so keep Spring AI on its
+			Spring Boot 3-compatible release line.
+		-->
+		<spring-ai-version>1.0.0</spring-ai-version>
 	</properties>
 
 	<dependencies>
