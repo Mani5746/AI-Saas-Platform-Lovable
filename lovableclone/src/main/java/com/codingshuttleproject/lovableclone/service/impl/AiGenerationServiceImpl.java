@@ -1,6 +1,7 @@
 package com.codingshuttleproject.lovableclone.service.impl;
 
 import com.codingshuttleproject.lovableclone.llm.PromptUtils;
+import com.codingshuttleproject.lovableclone.llm.advisors.FileTreeContextAdvisor;
 import com.codingshuttleproject.lovableclone.security.AuthUtil;
 import com.codingshuttleproject.lovableclone.service.AiGenerationService;
 import com.codingshuttleproject.lovableclone.service.ProjectFileService;
@@ -28,6 +29,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
     private final ChatClient chatClient;
     private final AuthUtil authUtil;
     private final ProjectFileService projectFileService;
+    private final FileTreeContextAdvisor fileTreeContextAdvisor;
     @Value("${spring.ai.openai.api-key}")
     private String openAiApiKey;
 
@@ -50,7 +52,9 @@ public class AiGenerationServiceImpl implements AiGenerationService {
         return chatClient.prompt()
                 .system(PromptUtils.CODE_GENERATION_SYSTEM_PROMPT )
                 .user(userMessage)
-                .advisors(advisorSpec -> advisorSpec.params(advisorParams))
+                .advisors(advisorSpec ->{ advisorSpec.params(advisorParams);
+                    advisorSpec.advisors(fileTreeContextAdvisor);})
+
                 .stream()
                 .chatResponse()
                 .doOnNext(response->{
