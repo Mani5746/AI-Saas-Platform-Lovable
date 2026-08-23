@@ -65,10 +65,7 @@ public class ProjectFileServiceImpl implements ProjectFileService {
         }
     }
 
-    @Override
-    public List<FileNode> getFileTree(Long projectId, Long userId) {
-        return List.of();
-    }
+
 
     @Override
     public FileContentResponse getFileContent(Long projectId, String path, Long userId) {

@@ -15,14 +15,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+        format_sql: false
   ai:
     openai:
       api-key: ${OPEN_AI_SECRET_KEY}
       base-url: https://openrouter.ai/api
       chat:
           options:
-            model: poolside/laguna-s-2.1:free
+            model: openrouter/free
             temperature: 0.0
 
 

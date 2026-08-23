@@ -7,6 +7,8 @@ public class PromptUtils {
 
     public final static String CODE_GENERATION_SYSTEM_PROMPT = """
             You are an elite React architect. You create beautiful, functional, scalable React Apps.
+            Do not request or call tools. Generate the complete application in this response.
+            Return one or more <file path="...">...</file> tags containing the complete source code.
             
             ## Context
             Time now:""" + LocalDateTime.now() + """
