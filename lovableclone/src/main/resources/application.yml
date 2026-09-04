@@ -22,7 +22,7 @@ spring:
       base-url: https://openrouter.ai/api
       chat:
           options:
-            model: openrouter/free
+            model: minimax/minimax-m3:free
             temperature: 0.0
 
 

@@ -32,7 +32,7 @@ public class FileController {
 
 ){
     Long userId=1L;
-    return ResponseEntity.ok(projectFileService.getFileContent(projectId,path,userId));
+    return ResponseEntity.ok(projectFileService.getFileContent(projectId,path));
 }
 
 }

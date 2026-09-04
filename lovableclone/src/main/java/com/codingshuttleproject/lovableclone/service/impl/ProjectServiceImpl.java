@@ -16,6 +16,7 @@ import com.codingshuttleproject.lovableclone.repository.ProjectRepository;
 import com.codingshuttleproject.lovableclone.repository.UserRepository;
 import com.codingshuttleproject.lovableclone.security.AuthUtil;
 import com.codingshuttleproject.lovableclone.service.ProjectService;
+import com.codingshuttleproject.lovableclone.service.ProjectTemplateService;
 import com.codingshuttleproject.lovableclone.service.SubscriptionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
     SubscriptionService subscriptionService;
+    ProjectTemplateService projectTemplateService;
 
     @Override
     public List<ProjectSummaryResponse> getUserProjects() {
@@ -82,6 +84,8 @@ ProjectMemberId projectMemberId= new ProjectMemberId(project.getId(), owner.getI
                 .project(project)
                 .build();
         projectMemberRepository.save(projectMember);
+        projectTemplateService.initializeProjectFromTemplate(project.getId());
+      //  projectTemplateService.seedProjectFiles(project.getId());
 
      return projectMapper.toProjectResponse(project);
     }

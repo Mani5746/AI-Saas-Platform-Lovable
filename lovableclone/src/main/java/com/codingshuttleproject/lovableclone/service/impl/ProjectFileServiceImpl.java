@@ -2,6 +2,7 @@ package com.codingshuttleproject.lovableclone.service.impl;
 
 import com.codingshuttleproject.lovableclone.dto.project.FileContentResponse;
 import com.codingshuttleproject.lovableclone.dto.project.FileNode;
+import com.codingshuttleproject.lovableclone.dto.project.FileTreeResponse;
 import com.codingshuttleproject.lovableclone.entity.Project;
 import com.codingshuttleproject.lovableclone.entity.ProjectFile;
 import com.codingshuttleproject.lovableclone.errors.ResourceNotFoundException;
@@ -12,10 +13,10 @@ import com.codingshuttleproject.lovableclone.service.ProjectFileService;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -23,10 +24,9 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
-
-@Service
-@Slf4j
 @RequiredArgsConstructor
+@AllArgsConstructor
+@Slf4j
 public class ProjectFileServiceImpl implements ProjectFileService {
 
     private final ProjectRepository projectRepository;
@@ -41,7 +41,7 @@ public class ProjectFileServiceImpl implements ProjectFileService {
 
 
     @Override
-    public List<FileNode>getFileTree(Long projectId) {
+    public  List<FileNode> getFileTree(Long projectId) {
         List<ProjectFile> projectFileList = projectFileRepository.findByProjectId(projectId);
         List<FileNode> projectFileNodes = projectFileMapper.toListOfFileNode(projectFileList);
         return projectFileNodes;
@@ -63,13 +63,6 @@ public class ProjectFileServiceImpl implements ProjectFileService {
             log.error("Failed to read file: {}/{}", projectId, path, e);
             throw new RuntimeException("Failed to read file content", e);
         }
-    }
-
-
-
-    @Override
-    public FileContentResponse getFileContent(Long projectId, String path, Long userId) {
-        return null;
     }
 
     @Override
@@ -122,3 +115,4 @@ public class ProjectFileServiceImpl implements ProjectFileService {
         return "text/plain";
     }
 }
+
