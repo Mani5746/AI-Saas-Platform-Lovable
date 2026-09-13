@@ -6,6 +6,7 @@ import com.codingshuttleproject.lovableclone.llm.tools.CodeGenerationTools;
 import com.codingshuttleproject.lovableclone.security.AuthUtil;
 import com.codingshuttleproject.lovableclone.service.AiGenerationService;
 import com.codingshuttleproject.lovableclone.service.ProjectFileService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;

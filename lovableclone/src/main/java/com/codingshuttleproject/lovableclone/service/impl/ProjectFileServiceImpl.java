@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -25,8 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 @RequiredArgsConstructor
-@AllArgsConstructor
 @Slf4j
+@Service
 public class ProjectFileServiceImpl implements ProjectFileService {
 
     private final ProjectRepository projectRepository;

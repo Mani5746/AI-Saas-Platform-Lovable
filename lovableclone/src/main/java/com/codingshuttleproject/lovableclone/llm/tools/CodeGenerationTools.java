@@ -2,6 +2,7 @@ package com.codingshuttleproject.lovableclone.llm.tools;
 
 import com.codingshuttleproject.lovableclone.service.ProjectFileService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Slf4j
 public class CodeGenerationTools {
 
     private final ProjectFileService projectFileService;
@@ -27,6 +29,8 @@ public class CodeGenerationTools {
 
         for(String path : paths){
             String cleanPath=path.startsWith("/")?path.substring(1):path;
+
+            log.info("Requested file:{}",cleanPath);
 
             String content= String.valueOf(projectFileService.getFileContent(projectId,cleanPath));
             result.add(String.format(

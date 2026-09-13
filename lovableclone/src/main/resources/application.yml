@@ -22,7 +22,7 @@ spring:
       base-url: https://openrouter.ai/api
       chat:
           options:
-            model: minimax/minimax-m3:free
+            model: google/gemma-4-26b-a4b-it:free
             temperature: 0.0
 
 
