@@ -42,11 +42,9 @@ spring:
             # Gemini 2.5 is retired for new API keys (404). Gemini 3 requires a
             # thought_signature echoed back on every tool call, which Spring AI
             # 1.0.0 drops; GeminiThoughtSignatureConfig fills it in.
-            model: gemini-3.8-flash
+            model: gemini-3.5-flash-lite
             temperature: 1.0
-            # Code generation emits whole files; the provider default is far
-            # too small and silently truncates the last <file> tag.
-            max-tokens: 8192
+            max-tokens: 32768
 
   # Free tiers rate-limit hard (HTTP 429). The Spring AI defaults
   # (10 attempts, x5 backoff) stall a request for minutes; fail faster.

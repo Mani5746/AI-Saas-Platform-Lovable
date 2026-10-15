@@ -22,6 +22,15 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class FileTreeContextAdvisor implements StreamAdvisor {
+
+    /**
+     * Files sent with every request, so the model rarely needs read_files.
+     * Each read_files round is one more paid/quota request to the AI provider.
+     */
+    public static final List<String> PRELOADED_FILES =
+            List.of("package.json", "index.html", "src/main.tsx", "src/App.tsx", "src/index.css");
+    private static final int MAX_PRELOAD_CHARS_PER_FILE = 12_000;
+
     private final ProjectFileService projectFileService;
 
 
@@ -56,7 +65,8 @@ public class FileTreeContextAdvisor implements StreamAdvisor {
 
 
         List<FileNode> fileTree = projectFileService.getFileTree(projectId);
-        String fileTreeContext = "\n\n ---- FILE_TREE ----\n"+fileTree.toString();
+        String fileTreeContext = "\n\n ---- FILE_TREE ----\n" + fileTree.toString()
+                + preloadedFilesContext(projectId, fileTree);
         allMessages.add(new SystemMessage(fileTreeContext));
 
         allMessages.addAll(userMessages);
@@ -65,6 +75,29 @@ public class FileTreeContextAdvisor implements StreamAdvisor {
                 .mutate()
                 .prompt(new Prompt(allMessages, request.prompt().getOptions()))
                 .build();
+    }
+
+    /** Current content of PRELOADED_FILES that exist in this project. */
+    private String preloadedFilesContext(Long projectId, List<FileNode> fileTree) {
+        List<String> paths = fileTree.stream().map(FileNode::path).toList();
+        StringBuilder sb = new StringBuilder("\n\n ---- ALREADY LOADED FILES ----\n")
+                .append("You already have the current content of these files. Do NOT call read_files for them.\n");
+        for (String path : PRELOADED_FILES) {
+            if (!paths.contains(path)) {
+                continue;
+            }
+            try {
+                String content = projectFileService.getFileContent(projectId, path).content();
+                if (content.length() > MAX_PRELOAD_CHARS_PER_FILE) {
+                    content = content.substring(0, MAX_PRELOAD_CHARS_PER_FILE) + "\n... (truncated, use read_files for the rest)";
+                }
+                sb.append("\nSTART OF FILE: ").append(path).append(" ---\n")
+                        .append(content).append("\n--- END OF FILE ---\n");
+            } catch (Exception e) {
+                log.warn("Could not preload {} for project {}", path, projectId, e);
+            }
+        }
+        return sb.toString();
     }
 
     @Override
