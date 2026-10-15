@@ -10,16 +10,18 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import  org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +37,10 @@ public class AiGenerationServiceImpl implements AiGenerationService {
     @Value("${spring.ai.openai.api-key}")
     private String openAiApiKey;
 
-    private static final Pattern FILE_TAG_PATTERN = Pattern.compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
+    private static final Pattern FILE_TAG_PATTERN = Pattern.compile(
+            "<file\\s+path\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</file>", Pattern.DOTALL);
+    // Models often wrap the file body in a markdown fence inside the <file> tag.
+    private static final Pattern CODE_FENCE_PATTERN = Pattern.compile("^```[\\w-]*\\R?|\\R?```$");
     @Override
     @PreAuthorize("@security.canEditProject(#projectId)")
     public Flux<String> streamResponse(String userMessage, Long projectId) {
@@ -62,22 +67,51 @@ public class AiGenerationServiceImpl implements AiGenerationService {
 
                 .stream()
                 .chatResponse()
-                .doOnNext(response->{
-                    String content= response.getResult().getOutput().getText();
-                    fullResponseBuffer.append(content);
+                // OpenRouter emits chunks with no choices (final usage frame) and
+                // chunks whose content is null (tool-call deltas). Both make
+                // getResult()/getText() return null, so unwrap defensively and drop
+                // the empties instead of letting an NPE kill the stream mid-answer.
+                .map(AiGenerationServiceImpl::textOf)
+                .filter(content -> !content.isEmpty())
+                .doOnNext(fullResponseBuffer::append)
+                .doOnError(error -> {
+                    Throwable cause = error;
+                    while (cause != null && !(cause instanceof WebClientResponseException)) {
+                        cause = cause.getCause();
+                    }
+
+                    if (cause instanceof WebClientResponseException responseError) {
+                        log.error("AI provider returned {} for project {}. Response body: {}",
+                                responseError.getStatusCode(),
+                                projectId,
+                                responseError.getResponseBodyAsString());
+                    } else {
+                        log.error("AI generation failed for project {}", projectId, error);
+                    }
                 })
-                .doOnComplete(()->{
-                    Schedulers.boundedElastic().schedule(()->{
-                        SecurityContextHolder.setContext(securityContext);
-                        try {
-                            parseAndSaveFiles(fullResponseBuffer.toString(),projectId);
-                        } finally {
-                            SecurityContextHolder.clearContext();
-                        }
-                    });
-                })
-                .doOnError(error->log.error("Error during streaming for project id"+projectId))
-                .map(response-> Objects.requireNonNull(response.getResult().getOutput().getText()));
+                // Keep persistence in the reactive chain. The previous detached
+                // doFinally task let the SSE request finish before MinIO/Postgres did.
+                .concatWith(Mono.fromRunnable(() -> {
+                    log.info("Generation for project {} finished with {} buffered chars",
+                            projectId, fullResponseBuffer.length());
+                    SecurityContextHolder.setContext(securityContext);
+                    try {
+                        parseAndSaveFiles(fullResponseBuffer.toString(), projectId);
+                    } catch (Exception e) {
+                        log.error("Failed to save generated files for project {}", projectId, e);
+                        throw new IllegalStateException("Failed to save generated project files", e);
+                    } finally {
+                        SecurityContextHolder.clearContext();
+                    }
+                }).subscribeOn(Schedulers.boundedElastic()).thenMany(Flux.<String>empty()));
+    }
+
+    private static String textOf(ChatResponse response) {
+        if (response == null || response.getResult() == null || response.getResult().getOutput() == null) {
+            return "";
+        }
+        String text = response.getResult().getOutput().getText();
+        return text == null ? "" : text;
     }
 
     private void parseAndSaveFiles(String fullResponse, Long projectId) {
@@ -97,10 +131,28 @@ public class AiGenerationServiceImpl implements AiGenerationService {
 //                </file>
 //                """;
         Matcher matcher = FILE_TAG_PATTERN.matcher(fullResponse);
+        int saved = 0;
+        int failed = 0;
         while (matcher.find()) {
-            String filePath = matcher.group(1);
-            String fileContent = matcher.group(2).trim();
-            projectFileService.saveFile(projectId,filePath,fileContent);
+            String filePath = matcher.group(1).trim();
+            String fileContent = CODE_FENCE_PATTERN.matcher(matcher.group(2).trim()).replaceAll("");
+            try {
+                projectFileService.saveFile(projectId,filePath,fileContent);
+                saved++;
+            } catch (Exception e) {
+                failed++;
+                log.error("Failed to save {} for project {}", filePath, projectId, e);
+            }
+        }
+        if (saved == 0) {
+            log.warn("No <file> tags found in the generated response for project {} ({} chars)",
+                    projectId, fullResponse.length());
+            throw new IllegalStateException("AI response contained no complete <file> tags to persist");
+        } else {
+            log.info("Saved {} file(s) for project {}", saved, projectId);
+        }
+        if (failed > 0) {
+            throw new IllegalStateException("Failed to persist " + failed + " generated file(s)");
         }
     }
 

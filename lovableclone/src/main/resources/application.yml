@@ -2,6 +2,14 @@ spring:
   application:
     name: lovableclone
 
+  # Local secrets (GEMINI_API_KEY) live in the git-ignored .env file. Both
+  # paths are listed so it loads whether the working dir is the repo root or
+  # the lovableclone module. A real environment variable still wins.
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:lovableclone/.env[.properties]
+
   datasource:
     url: jdbc:postgresql://localhost:9010/pgvector-test
     username: user
@@ -17,13 +25,39 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
   ai:
+    # ---------------------------------------------------------------------
+    # Google Gemini, called directly (no OpenRouter) through Gemini's
+    # OpenAI-compatible endpoint, so the existing spring-ai openai starter
+    # works unchanged:
+    #   https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+    # Key: https://aistudio.google.com/apikey  ->  export GEMINI_API_KEY=...
+    # Model ids have no "google/" prefix here (that is OpenRouter syntax).
+    # ---------------------------------------------------------------------
     openai:
-      api-key: ${OPEN_AI_SECRET_KEY}
-      base-url: https://openrouter.ai/api
+      api-key: ${GEMINI_API_KEY}
+      base-url: https://generativelanguage.googleapis.com
       chat:
+          completions-path: /v1beta/openai/chat/completions
           options:
-            model: google/gemma-4-26b-a4b-it:free
-            temperature: 0.0
+            # Gemini 2.5 is retired for new API keys (404). Gemini 3 requires a
+            # thought_signature echoed back on every tool call, which Spring AI
+            # 1.0.0 drops; GeminiThoughtSignatureConfig fills it in.
+            model: gemini-3.8-flash
+            temperature: 1.0
+            # Code generation emits whole files; the provider default is far
+            # too small and silently truncates the last <file> tag.
+            max-tokens: 8192
+
+  # Free tiers rate-limit hard (HTTP 429). The Spring AI defaults
+  # (10 attempts, x5 backoff) stall a request for minutes; fail faster.
+    retry:
+      max-attempts: 3
+      backoff:
+        initial-interval: 2s
+        multiplier: 2
+        max-interval: 20s
+      on-client-errors: false
+      exclude-on-http-codes: 400,401,402,403,404
 
 
 jwt:
