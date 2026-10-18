@@ -42,9 +42,14 @@ spring:
             # Gemini 2.5 is retired for new API keys (404). Gemini 3 requires a
             # thought_signature echoed back on every tool call, which Spring AI
             # 1.0.0 drops; GeminiThoughtSignatureConfig fills it in.
-            model: gemini-3.5-flash-lite
+            model: gemini-3.7-flash
             temperature: 1.0
-            max-tokens: 32768
+            # Gemini's hidden thinking tokens count against max-tokens; on the default
+            # effort it thought for 140s and the files were cut off (finish reason LENGTH).
+            reasoning-effort: low
+            # gemini-3.7-flash's maximum. A big rewrite sent as one write_files call hit 32768
+            # (finish reason LENGTH), and a cut-off tool call is dropped completely.
+            max-tokens: 65536
 
   # Free tiers rate-limit hard (HTTP 429). The Spring AI defaults
   # (10 attempts, x5 backoff) stall a request for minutes; fail faster.
@@ -70,6 +75,8 @@ stripe:
 client.url: http://localhost:8080
 
 logging:
+  file:
+    name: logs/app.log
   level:
     org.springframework.ai:
       chat.client: DEBUG

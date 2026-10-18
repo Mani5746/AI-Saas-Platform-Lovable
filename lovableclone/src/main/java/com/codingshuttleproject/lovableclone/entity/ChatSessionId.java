@@ -12,6 +12,7 @@ import java.io.Serializable;
 @ToString
 
 public class ChatSessionId implements Serializable {
-    Long userId;
+
     Long projectId;
+    Long userId;
 }

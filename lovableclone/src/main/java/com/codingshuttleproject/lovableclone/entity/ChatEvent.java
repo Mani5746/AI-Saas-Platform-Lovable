@@ -34,14 +34,10 @@ public class ChatEvent {
     @Column(nullable = false)
     Integer sequenceOrder;
 
-    @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-            @OrderBy("sequenceOrder ASC")
-    List<ChatEvent> events;
-
     @Column(columnDefinition = "text",nullable = false)
     String content;
 
-    String filePath;
+    String filePath; // NULL Unless file Edit
 
     @Column(columnDefinition = "text")
     String metadata;

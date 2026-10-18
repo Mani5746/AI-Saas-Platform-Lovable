@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,6 +38,10 @@ public class ChatMessage {
     String toolCalls; // JSON Array of Tools Called
 
     Integer tokensUsed=0;
+
+    @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("sequenceOrder ASC")
+    List<ChatEvent> events;
 
    @CreationTimestamp
     Instant createdAt;
